@@ -1,0 +1,85 @@
+# main.py
+
+from fastapi import FastAPI, UploadFile, File
+from fastapi.middleware.cors import CORSMiddleware
+from services.ocr_services import extract_text
+from services.feature_builder import build_ml_features
+from services.ml_classifier import predict_health_score
+
+from pydantic import BaseModel
+from services.ocr.postprocess import clean_tokens
+
+app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+class TextPayload(BaseModel):
+    text: str
+
+@app.get("/")
+def root():
+    return {"message": "NutriSnap Backend Running"}
+
+@app.post("/extract-text")
+async def extract_text_endpoint(file: UploadFile = File(...)):
+    image_bytes = await file.read()
+    
+    # 1. OCR Stage
+    result = extract_text(image_bytes)
+    
+    return {
+        "status": "success",
+        "extracted_text": result.get('cleaned', '')
+    }
+
+@app.post("/analyze-text")
+async def analyze_text_endpoint(payload: TextPayload):
+    # Process user edited text string natively independent of image
+    result = clean_tokens(payload.text)
+    nutrition_dict = result.get('nutrition_values', {})
+    
+    # 2. Feature Building Stage
+    features = build_ml_features(nutrition_dict)
+    
+    # 3. ML Classification Stage
+    health_assessment = predict_health_score(features)
+    
+    # 4. Generate Health Tips (WHO guidelines scaled to 100g)
+    health_tips = []
+    if features[1] > 20: # Total Fat
+        health_tips.append(f"High in total fat ({features[1]:.1f}g per 100g)")
+    if features[6] > 5:  # Saturated Fat
+        health_tips.append(f"High in saturated fat ({features[6]:.1f}g per 100g)")
+    if features[2] > 15: # Sugars
+        health_tips.append(f"High in sugars ({features[2]:.1f}g per 100g)")
+    if features[3] > 600: # Sodium
+        health_tips.append(f"High in sodium ({features[3]:.1f}mg per 100g)")
+    if features[4] > 10: # Protein
+        health_tips.append(f"Good source of protein ({features[4]:.1f}g per 100g)")
+    if features[5] > 5:  # Fiber
+        health_tips.append(f"Excellent source of fiber ({features[5]:.1f}g per 100g)")
+    if not health_tips:
+        health_tips.append("Moderate nutritional profile")
+        
+    return {
+        "status": "success",
+        "nutrition_values": nutrition_dict,
+        "additives": result.get('additives', []),
+        "health_tips": health_tips,
+        "ml_features": {
+            "energy_100g": features[0],
+            "fat_100g": features[1],
+            "sugars_100g": features[2],
+            "sodium_100g": features[3],
+            "protein_100g": features[4],
+            "fiber_100g": features[5],
+            "saturated_fat_100g": features[6],
+            "carbohydrates_100g": features[7]
+        },
+        "health_score": health_assessment
+    }

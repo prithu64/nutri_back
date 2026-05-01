@@ -1,0 +1,60 @@
+[
+  {
+    "filename": "label6.jpeg",
+    "cleaned_text": "NUTRITIONAL INFORMATION (Approx Values) Per Serve %RDA 100g (2og per serve 526 10.5 5.3 Protein (g) 5.6 1.1 Carbohydrate g) 61. 12.2 Total Sugars (g) 6.0 1.2 Added Sugars 52 1.0 2.0 Total Fat (g) 29.5 5.9 8.8 1 Saturated fat 6.9 1.4.64 Saturated fat g) 13.8 2.8 12.2 Trans fat+ 0. 0.0.2 1.0 Trans fat- (g 0.1 0.0.2 1.0 Sodium (mg) 758.8 151.8 7.6 FOther than naturally occurringtrans fat Refer coding window for Approx No 0f Serves Per PacNs) Per (g",
+    "nutrition_values": {
+      "protein": "5.6g",
+      "total_fat": "29.5g",
+      "carbohydrates": "61.g",
+      "sugars": "6.0g",
+      "sodium": "758.8 mg",
+      "serving_size": "100g"
+    },
+    "success": true
+  },
+  {
+    "filename": "label2.jpeg",
+    "cleaned_text": "",
+    "nutrition_values": {},
+    "success": false
+  },
+  {
+    "filename": "label4.jpeg",
+    "cleaned_text": "",
+    "nutrition_values": {},
+    "success": false
+  },
+  {
+    "filename": "label3.jpeg",
+    "cleaned_text": "NUTRITIONAL IINFORMATION Plain Oats Per Per YRDA 12 5 Servings Per Fack IQOg Serve PerServeA Energy (kcal) 380 I518.76 Protein (g) 12.2 4.9 90 Carbohydrate (g 692 277 TotalF (g) 0.8 0.3 Added (g) Q0 Dietary Fibre (g) 10.8 4.3 Soluble Dietary Fibre l) 3.3 1.3 Insoluble Dietary Fibre ly 7.5 3.0 TotalFat (g) 8.4 3.4 50 Saturated Faity lcids (g) 2.5 4.5 Mono Unsaturated Fatty Acius (g) 3.6 1.4 Pol Unsaturated Acius (g) 1.8.7 Trans Fatty Acid (g) Q0 Q0.0 Sodium (mg) 6.5 2.6 1 Itvon (mg) 3.4 1.4 Magnesium (mg) 972 38.9.8 Zinc (mg) 2.0 0.8 47 Sugars Sugars Fatty",
+    "nutrition_values": {
+      "energy": "380 kcal",
+      "protein": "12.2g",
+      "total_fat": "8.4g",
+      "sodium": "6.5 mg"
+    },
+    "success": true
+  },
+  {
+    "filename": "label5.jpeg",
+    "cleaned_text": "Per Per Serve 100 g (259) Serve (Approx Values) 457 11.4 5.7 Energy 9.0 2.3 (g) 645 761 (g) 8 Sugars 9) 0.8 1.6 Sugars g) 4.8 7.2 fat (g) 6.8 1.7 7.7 fat (g) 25 M14 10,0 fat (9 at 1 0.0.3 1.5 naturally 0.6 0,2 1.0 Trans bansfal) 14,6 76z2 mg 2 Nutritional Information (kcal) Protein Carbohydrate 3. 44 Total Added Total JSaturated SSaturated (othert Trans bans occuring Than 295.6 oecurring pack Soqium per serves",
+    "nutrition_values": {
+      "total_fat": "6.8g",
+      "sugars": "4.8g",
+      "serving_size": "100g"
+    },
+    "success": true
+  },
+  {
+    "filename": "label1.jpg",
+    "cleaned_text": "Nutrition Information % Servings per package 45 Serving Size 2 piece (35 Average %a Daily Average Ilake % (per Qty per 8 Serving Serving 100 9 Energy 20kcal 10 % 560 kcal 2 820 kJ Protein 3g E Total fat 13g 20 % 38 9 saturated fat 14 % 99 trans fat 0 % I cholesterol 0 mg 0 mg Carbohydrate 16 9.46 9 Total sugars 4g 119 2 added sugars 2g 4 % 69 Sodium 260 mg 13 % 750 mg 1 8 0ry 9 g 0 9",
+    "nutrition_values": {
+      "energy": "20 kcal",
+      "protein": "3g",
+      "total_fat": "13g",
+      "sugars": "4g",
+      "sodium": "260 mg"
+    },
+    "success": true
+  }
+]
