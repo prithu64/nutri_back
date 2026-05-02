@@ -31,10 +31,41 @@ async def extract_text_endpoint(file: UploadFile = File(...)):
     
     # 1. OCR Stage
     result = extract_text(image_bytes)
+    raw_text = result.get('cleaned', '')
     
+    # 2. UX Stage: Pre-parse the raw text to generate a beautiful list for the frontend
+    import re
+    parsed = clean_tokens(raw_text)
+    nutrition = parsed.get('nutrition_values', {})
+    
+    formatted_text = "--- PLEASE REVIEW AND CORRECT ---\n\n"
+    
+    keys = [
+        ('energy', 'Energy', 'kcal'),
+        ('protein', 'Protein', 'g'),
+        ('total_fat', 'Total Fat', 'g'),
+        ('saturated_fat', 'Saturated Fat', 'g'),
+        ('carbohydrates', 'Carbohydrates', 'g'),
+        ('sugars', 'Total Sugars', 'g'),
+        ('sodium', 'Sodium', 'mg'),
+        ('fiber', 'Fiber', 'g')
+    ]
+    
+    for key, label, unit in keys:
+        val = nutrition.get(key)
+        if val:
+            # Strip string units so we can format it perfectly for the Regex downstream
+            num = re.sub(r'[^\d\.]', '', val)
+            formatted_text += f"{label} {num} {unit}\n"
+        else:
+            formatted_text += f"{label} 0 {unit}    <--- MISSING: PLEASE FIX\n"
+            
+    formatted_text += "\n\n--- RAW SCAN DATA (For Reference) ---\n\n"
+    formatted_text += raw_text
+
     return {
         "status": "success",
-        "extracted_text": result.get('cleaned', '')
+        "extracted_text": formatted_text
     }
 
 @app.post("/analyze-text")
