@@ -83,19 +83,23 @@ async def analyze_text_endpoint(payload: TextPayload):
     # 4. Generate Health Tips (WHO guidelines scaled to 100g)
     health_tips = []
     if features[1] > 20: # Total Fat
-        health_tips.append(f"High in total fat ({features[1]:.1f}g per 100g)")
+        health_tips.append({"text": f"Excessive total fat ({features[1]:.1f}g) - Exceeds optimal limits", "type": "negative"})
     if features[6] > 5:  # Saturated Fat
-        health_tips.append(f"High in saturated fat ({features[6]:.1f}g per 100g)")
+        health_tips.append({"text": f"High saturated fat ({features[6]:.1f}g) - Increases cardiovascular risk", "type": "negative"})
     if features[2] > 15: # Sugars
-        health_tips.append(f"High in sugars ({features[2]:.1f}g per 100g)")
+        health_tips.append({"text": f"High added sugars ({features[2]:.1f}g) - Monitor glucose impact", "type": "negative"})
     if features[3] > 600: # Sodium
-        health_tips.append(f"High in sodium ({features[3]:.1f}mg per 100g)")
+        health_tips.append({"text": f"High sodium density ({features[3]:.1f}mg) - Exceeds FSSAI safe limits", "type": "negative"})
     if features[4] > 10: # Protein
-        health_tips.append(f"Good source of protein ({features[4]:.1f}g per 100g)")
+        health_tips.append({"text": f"Excellent protein source ({features[4]:.1f}g per 100g)", "type": "positive"})
     if features[5] > 5:  # Fiber
-        health_tips.append(f"Excellent source of fiber ({features[5]:.1f}g per 100g)")
+        health_tips.append({"text": f"High in dietary fiber ({features[5]:.1f}g) - Supports digestion", "type": "positive"})
     if not health_tips:
-        health_tips.append("Moderate nutritional profile")
+        health_tips.append({"text": "Moderate nutritional profile with no extreme spikes.", "type": "neutral"})
+        
+    # 5. Call LLM for Dynamic Assessment
+    from services.llm_service import generate_llm_assessment
+    llm_assessment, llm_recommendation = generate_llm_assessment(health_assessment['grade'], features)
         
     return {
         "status": "success",
@@ -112,5 +116,7 @@ async def analyze_text_endpoint(payload: TextPayload):
             "saturated_fat_100g": features[6],
             "carbohydrates_100g": features[7]
         },
-        "health_score": health_assessment
+        "health_score": health_assessment,
+        "llm_assessment": llm_assessment,
+        "llm_recommendation": llm_recommendation
     }
