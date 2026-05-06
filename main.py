@@ -70,8 +70,11 @@ async def extract_text_endpoint(file: UploadFile = File(...)):
 
 @app.post("/analyze-text")
 async def analyze_text_endpoint(payload: TextPayload):
-    # Process user edited text string natively independent of image
-    result = clean_tokens(payload.text)
+    # Important: Only parse the data ABOVE the raw scan reference divider
+    # to prevent the "Last-Match" logic from sniping messy raw data.
+    clean_input = payload.text.split("--- RAW SCAN DATA")[0]
+    
+    result = clean_tokens(clean_input)
     nutrition_dict = result.get('nutrition_values', {})
     
     # 2. Feature Building Stage

@@ -63,84 +63,60 @@ def clean_tokens(detections):
     # ============================================
     nutrition = {}
     
-    # Energy
-    energy_match = re.search(r'energy\s*\(?kcal\)?\s*(\d+\.?\d*)', text, re.IGNORECASE)
-    if not energy_match:
-        energy_match = re.search(r'energy\s*(\d+\.?\d*)\s*kcal', text, re.IGNORECASE)
-    # No fallback needed here: Guessing the first number after 'per serve' is too prone to eating serving weights (especially when OCR misreads 'g' as '9')
+    # Global "9 to g" correction: OCR often reads "g" as "9"
+    # If a number ends in " 9", it's almost certainly a "g"
+    text = re.sub(r'(\d+)\s+9\b', r'\1 g', text)
     
-    if energy_match:
-        val = energy_match.group(1)
-        if float(val) < 1000:
-            nutrition['energy'] = val + ' kcal'
+    # Energy (Kcal) - Priority on the higher value (usually the 100g column)
+    energy_matches = re.findall(r'energy\b[^0-9]*(\d+\.?\d*)', text, re.IGNORECASE)
+    if energy_matches:
+        # Pick the highest value found (560 kcal > 200 kcal)
+        val = max([float(v) for v in energy_matches])
+        if val < 1000:
+            nutrition['energy'] = str(val) + ' kcal'
     
     # Protein
-    protein_match = re.search(r'protein\s*\(?g\)?\s*(\d+\.?\d*)', text, re.IGNORECASE)
-    if not protein_match:
-        protein_match = re.search(r'protein\s*(\d+\.?\d*)\s*g', text, re.IGNORECASE)
-    if protein_match:
-        val = protein_match.group(1)
-        if float(val) < 100:
-            nutrition['protein'] = val + 'g'
+    protein_matches = re.findall(r'protein\b.*?(\d+\.?\d*)', text, re.IGNORECASE)
+    if protein_matches:
+        val = protein_matches[-1]
+        nutrition['protein'] = val + 'g'
     
     # Total Fat
-    fat_match = re.search(r'total\s*fat\s*\(?g\)?\s*(\d+\.?\d*)', text, re.IGNORECASE)
-    if not fat_match:
-        fat_match = re.search(r'total\s*fat\s*(\d+\.?\d*)\s*g', text, re.IGNORECASE)
-    if not fat_match:
-        fat_match = re.search(r'fat\s*\(?g\)?\s*(\d+\.?\d*)', text, re.IGNORECASE)
-    if fat_match:
-        val = fat_match.group(1)
-        if float(val) < 100:
-            nutrition['total_fat'] = val + 'g'
-    
-    # Carbohydrates
-    carb_match = re.search(r'carbohydrate\s*\(?g\)?\s*(\d+\.?\d*)', text, re.IGNORECASE)
-    if not carb_match:
-        carb_match = re.search(r'carbohydrates?\s*(\d+\.?\d*)\s*g', text, re.IGNORECASE)
-    if carb_match:
-        val = carb_match.group(1)
-        if float(val) < 200:
-            nutrition['carbohydrates'] = val + 'g'
-    
-    # Sugars
-    sugar_match = re.search(r'total\s*sugars?\s*\(?g\)?\s*(\d+\.?\d*)', text, re.IGNORECASE)
-    if not sugar_match:
-        sugar_match = re.search(r'sugars?\s*\(?g\)?\s*(\d+\.?\d*)', text, re.IGNORECASE)
-    if not sugar_match:
-        sugar_match = re.search(r'sugars?\s*(\d+\.?\d*)\s*g', text, re.IGNORECASE)
-    if sugar_match:
-        val = sugar_match.group(1)
-        if float(val) < 100:
-            nutrition['sugars'] = val + 'g'
+    fat_matches = re.findall(r'(?:total\s*)?fat\b.*?(\d+\.?\d*)', text, re.IGNORECASE)
+    if fat_matches:
+        val = fat_matches[-1]
+        nutrition['total_fat'] = val + 'g'
     
     # Saturated Fat
-    sat_fat_match = re.search(r'saturated\s*fat\s*\(?g\)?\s*(\d+\.?\d*)', text, re.IGNORECASE)
-    if not sat_fat_match:
-        sat_fat_match = re.search(r'saturated\s*fat\s*(\d+\.?\d*)\s*g', text, re.IGNORECASE)
-    if sat_fat_match:
-        val = sat_fat_match.group(1)
-        if float(val) < 100:
-            nutrition['saturated_fat'] = val + 'g'
-
+    sat_matches = re.findall(r'saturated\b.*?fat\b.*?(\d+\.?\d*)', text, re.IGNORECASE)
+    if sat_matches:
+        val = sat_matches[-1]
+        nutrition['saturated_fat'] = val + 'g'
+    
+    # Carbohydrates
+    carb_matches = re.findall(r'carbohydrates?\b.*?(\d+\.?\d*)', text, re.IGNORECASE)
+    if carb_matches:
+        val = carb_matches[-1]
+        nutrition['carbohydrates'] = val + 'g'
+    
+    # Sugars
+    sugar_matches = re.findall(r'sugars?\b.*?(\d+\.?\d*)', text, re.IGNORECASE)
+    if sugar_matches:
+        val = sugar_matches[-1]
+        nutrition['sugars'] = val + 'g'
+    
     # Fiber
-    fiber_match = re.search(r'fib(?:er|re)\s*\(?g\)?\s*(\d+\.?\d*)', text, re.IGNORECASE)
-    if not fiber_match:
-        fiber_match = re.search(r'dietary\s*fib(?:er|re)\s*\(?g\)?\s*(\d+\.?\d*)', text, re.IGNORECASE)
-    if not fiber_match:
-        fiber_match = re.search(r'fib(?:er|re)\s*(\d+\.?\d*)\s*g', text, re.IGNORECASE)
-    if fiber_match:
-        val = fiber_match.group(1)
-        if float(val) < 100:
-            nutrition['fiber'] = val + 'g'
-    # Sodium
-    sodium_match = re.search(r'sodium\s*\(?mg\)?\s*(\d+\.?\d*)', text, re.IGNORECASE)
-    if not sodium_match:
-        sodium_match = re.search(r'sodium\s*(\d+\.?\d*)\s*mg', text, re.IGNORECASE)
-    if sodium_match:
-        val = sodium_match.group(1)
-        if float(val) < 5000:
-            nutrition['sodium'] = val + ' mg'
+    fiber_matches = re.findall(r'fib(?:er|re)\b.*?(\d+\.?\d*)', text, re.IGNORECASE)
+    if fiber_matches:
+        val = fiber_matches[-1]
+        nutrition['fiber'] = val + 'g'
+
+    # Sodium (mg)
+    sodium_matches = re.findall(r'sodium\b.*?(\d+\.?\d*)', text, re.IGNORECASE)
+    if sodium_matches:
+        # Pick the highest
+        val = max([float(v) for v in sodium_matches])
+        nutrition['sodium'] = str(val) + ' mg'
     
     # Serving Size
     serving_match = re.search(r'serv(?:ing|e)\s*size\s*[:]?\s*(\d+\.?\d*)\s*g', text, re.IGNORECASE)

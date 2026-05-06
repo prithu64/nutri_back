@@ -18,8 +18,8 @@ def generate_llm_assessment(grade_str, features):
     macros = f"Energy: {features[0]:.1f}kcal, Fat: {features[1]:.1f}g, Sugar: {features[2]:.1f}g, Sodium: {features[3]:.1f}mg, Protein: {features[4]:.1f}g, Fiber: {features[5]:.1f}g"
     
     # Fallback text in case the free API fails or rate-limits during the presentation
-    fallback_assessment = "This product has been algorithmically evaluated using WHO thresholds. Please review the specific macronutrient warnings highlighted by the XGBoost model."
-    fallback_recommendation = "Consume mindfully according to standard dietary guidelines, paying close attention to portion sizes."
+    fallback_assessment = "Clinical analysis identifies specific nutritional imbalances that exceed standard safety thresholds. The XGBoost engine has flagged critical concerns in the nutrient profile."
+    fallback_recommendation = "Immediate dietary caution is advised. Limit consumption of this product and prioritize whole, unprocessed alternatives to maintain metabolic health."
     
     try:
         print("Ping OpenRouter API...")
@@ -64,12 +64,12 @@ def generate_llm_assessment(grade_str, features):
                 else:
                     return content.strip().strip("'").strip('"'), fallback_recommendation
             except Exception:
-                return fallback_assessment, fallback_recommendation
+                return None, None
                 
         else:
             print(f"LLM API Error: {response.status_code}")
-            return fallback_assessment, fallback_recommendation
+            return None, None
             
     except Exception as e:
         print(f"LLM API Exception: {e}")
-        return fallback_assessment, fallback_recommendation
+        return None, None
