@@ -20,6 +20,7 @@ def extract_text(image_bytes):
     # We want to re-order the methods list to try the most reliable one FIRST.
     # Unsharp and Grayscale usually perform best, so we pluck them out and run them first.
     method_dict = {name: img for name, img in methods}
+    
     run_order = ["unsharp", "grayscale", "contrast", "denoised", "sharpened", "adaptive", "binary"]
     
     for name in run_order:

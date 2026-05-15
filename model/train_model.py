@@ -57,7 +57,7 @@ print("\n[STEP 4] Initiating Algorithm Deathmatch...")
 # Define Models
 models = {
     "Random Forest": Pipeline([
-        ('imputer', SimpleImputer(strategy='mean')), # RF crashes on missing data, so we impute!
+        ('imputer', SimpleImputer(strategy='mean')),
         ('model', RandomForestClassifier(n_estimators=50, max_depth=12, n_jobs=-1, random_state=42))
     ]),
     "HistGradientBoosting": HistGradientBoostingClassifier(
